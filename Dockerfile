@@ -7,7 +7,8 @@ ENV VIRTUAL_ENV=/app/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
  
 COPY build.sh .
-RUN ./build.sh
+RUN  chmod +x ./build.sh
+RUN  ./build.sh
  
 # Stage 2
 FROM python:3-alpine AS runner
