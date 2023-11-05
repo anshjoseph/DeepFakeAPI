@@ -6,8 +6,8 @@ RUN python3 -m venv venv
 ENV VIRTUAL_ENV=/app/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
  
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY build.sh .
+RUN ./build.sh
  
 # Stage 2
 FROM python:3-alpine AS runner
