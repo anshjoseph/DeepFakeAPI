@@ -168,6 +168,7 @@ async def create_upload_file(file: UploadFile, background_tasks: BackgroundTasks
 async def checkStatus(id: str):
     if Result.get(id)!= None:
         print(Result.get(id))
+        os.remove(f"./uploaded/{id}.wav")
         return Result.get(id)
     else:
         return {"out":None,"status":None,"message":"server retrive the file"}
