@@ -173,4 +173,4 @@ async def checkStatus(id: str):
     else:
         return {"out":None,"status":None,"message":"server retrive the file"}
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", reload=True, port=80)
+    uvicorn.run("app:app", host="0.0.0.0", reload=True, port=10000)
