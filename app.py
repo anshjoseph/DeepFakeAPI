@@ -24,13 +24,10 @@ app.add_middleware(
 )
 
 # LOAD MODEL
-MODEL = load_model("../MODEL/model.h5")
+MODEL = load_model("./MODEL/model.h5")
 # GLOBAL DATA STORE
 Result:dict = dict()
 
-# img = cv2.imread("/media/ansh/22A048A8A04883EF/WORK/ML/DeepFakeVoiceDectection/Train/Spectrogram/FAKE/0d4d5e35-ab2f-4b80-bb47-bc65f53801dd.png")
-# img = cv2.resize(img,(256,256))
-# print(MODEL.predict(np.array([img])))
 # DATA PROCESSING
 """ short time fourier transform of audio signal """
 def stft(sig, frameSize, overlapFac=0.5, window=np.hanning):
@@ -175,4 +172,4 @@ async def checkStatus(id: str):
     else:
         return {"out":None,"status":None,"message":"server retrive the file"}
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="127.0.0.1", reload=True, port=8000)
+    uvicorn.run("app:app", host="0.0.0.0", reload=True, port=80)
