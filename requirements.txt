@@ -53,13 +53,6 @@ requests
 requests-oauthlib
 rsacikit-learn
 scipy
-six
-sniffio
-soundfile
-soxr
-starlette
-tensorboard
-tensorboard-data-server
 tensorflow
 tensorflow-estimator
 tensorflow-io
