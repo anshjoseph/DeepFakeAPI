@@ -13,7 +13,10 @@ import scipy.io.wavfile as wav
 from numpy.lib import stride_tricks
 import librosa    
 from scipy.io.wavfile import write
+from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent
+print(BASE_DIR)
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -24,7 +27,7 @@ app.add_middleware(
 )
 
 # LOAD MODEL
-MODEL = load_model("./MODEL/model.h5")
+MODEL = load_model(BASE_DIR / "MODEL/model.h5")
 # GLOBAL DATA STORE
 Result:dict = dict()
 
@@ -111,9 +114,10 @@ def plotstft(audiopath, binsize=2**10, plotpath=None, colormap="jet"):
 
     return ims
 def genrateSpectroGram(path:str,id:str):
-    plotstft(path,plotpath=f"./TEMP/{id}.png")
-    data = cv2.imread(f"./TEMP/{id}.png")
-    os.remove(f"./TEMP/{id}.png")
+    plotpath:str = BASE_DIR / f"TEMP/{id}.png"
+    plotstft(path,plotpath= plotpath)
+    data = cv2.imread(str(plotpath))
+    os.remove(plotpath)
     return data[13:593,104:1032]
 
 
@@ -122,15 +126,16 @@ def genrateSpectroGram(path:str,id:str):
 def RunModel(id:str,model):
     Result[id] = {"out":None,"status":0,"message":"file start processing"}
     try:
-        y, s = librosa.load(f'./uploaded/{id}.wav', sr=32000)
+        y, s = librosa.load(BASE_DIR / f'uploaded/{id}.wav', sr=32000)
         duration = len(y)/32000
         
         if duration<=8 and duration>=6:
+            file_loc:str = BASE_DIR / f'uploaded/{id}.wav'
             # file resampled
-            write(f'./uploaded/{id}.wav',32000,y)
+            write(file_loc,32000,y)
             Result[id] = {"out":None,"status":1,"message":"file get resampled"}
             # file resampled
-            img = genrateSpectroGram(f'./uploaded/{id}.wav',id)
+            img = genrateSpectroGram(file_loc,id)
             Result[id] = {"out":None,"status":2,"message":"file converted into spectrogram"}
             # data preprocessing
             img = cv2.resize(img,(256,256))
@@ -146,7 +151,8 @@ def RunModel(id:str,model):
         else:
             Result[id] = {"out":None,"status":-1,"message":"duration error"}
             return
-    except:
+    except Exception as e:
+        print(e)
         # file pasrse error
         Result[id] = {"out":None,"status":-2,"message":"file parse error"}
         return
@@ -156,7 +162,8 @@ def RunModel(id:str,model):
 async def create_upload_file(file: UploadFile, background_tasks: BackgroundTasks):
     temp = await file.read()
     id = str(uuid4())
-    path = f"./uploaded/{id}.wav"
+    path = BASE_DIR / f"uploaded/{id}.wav"
+    print(f"path:{path}")
     with open(path, 'a') as file:
         pass
     with open(path, 'wb') as file:
@@ -168,7 +175,7 @@ async def create_upload_file(file: UploadFile, background_tasks: BackgroundTasks
 async def checkStatus(id: str):
     if Result.get(id)!= None:
         print(Result.get(id))
-        os.remove(f"./uploaded/{id}.wav")
+        os.remove(BASE_DIR / f"uploaded/{id}.wav")
         return Result.get(id)
     else:
         return {"out":None,"status":None,"message":"server retrive the file"}
